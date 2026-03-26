@@ -1,0 +1,150 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #00070e;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-display {
+    display: none;
+}
+
+#game {
+    display: block;
+    touch-action: none;
+    image-rendering: pixelated;
+    background-image: url(imgs/backGround.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#draw {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+#round-display {
+    position: absolute;
+    color: red;
+    font-family: fantasy;
+    font-size: 90px;
+    white-space: nowrap;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    transition: 1s;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#tutorial {
+    position: absolute;
+    color: #ffb300;
+    font-size: 30px;
+    font-family: fantasy;
+    text-align: center;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #00000078;
+    padding: 10px 0;
+    border-radius: 15px;
+    margin: 0;
+    opacity: 0;
+    transition: 1s;
+    pointer-events: none;
+}
+
+
+#menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.game-name {
+    color: red;
+    font-family: fantasy;
+    font-size: 30px;
+    margin: 0 0 40px 0;
+}
+
+.start-button {
+    border: none;
+    width: 100px;
+    height: 100px;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    transform: rotate(90deg);
+    cursor: pointer;
+}
+
+.start-button p {
+    transform: rotate(-90deg);
+    margin: 0;
+    margin-top: 29px;
+    font-size: 25px;
+    font-family: fantasy;
+}
+
+#highest-score {
+    display: none;
+    color: red;
+    font-family: fantasy;
+    font-size: 20px;
+    letter-spacing: 1px;
+}
+
+footer {
+    margin-top: 15px;
+}
+
+.telegram {
+    font-size: 40px;
+    margin-top: 20px;
+    padding-right: 10px;
+}
+
+a {
+    text-decoration: none;
+    color: #37abc7;
+}
+
+@media (max-width: 625px) {
+    /* #game {
+        transform: translate(-50%, -50%) rotate(90deg);
+    }
+
+    #draw {
+        transform: translate(-50%, -50%) rotate(90deg);
+    } */
+
+    #game-display {
+        transform: rotate(90deg);
+        transform-origin: center;
+    }
+
+    #menu {
+        transform: rotate(90deg);
+    }
+
+    #tutorial {
+        transform: translate(-50%, -180%);
+        width: 440px;
+    }
+}

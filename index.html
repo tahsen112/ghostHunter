@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Hunter</title>
+    <link rel="shortcut icon" href="./imgs/ghost.png" type="image/x-icon">
+    
+    <link rel="stylesheet" href="style.css">
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body id="body">
+    <div id="game-display">
+        <canvas id="game"></canvas>
+        <canvas id="draw"></canvas>
+        <p id="round-display"></p>
+        <p id="tutorial">
+            Defeat the ghost by drawing its symbole anywhere
+        </p>
+    </div>
+
+    <div id="menu">
+        <p class="game-name">
+            Ghost Hunter
+        </p>
+        <button class="start-button" onclick="startGame()">
+            <p>play</p>
+        </button>
+        <p id="highest-score">highest score: 5000</p>
+
+        <footer>
+            <div class="telegram">
+                <a href="http://t.me/l8l56" target="_blank">
+                    <i class="fa-brands fa-telegram"></i>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
