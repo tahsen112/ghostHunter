@@ -5,8 +5,6 @@ const drawCtx = drawCanva.getContext(`2d`);
 const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 const minGhostSpeed = 0.3;
 
-console.log(sessionStorage.IsThisFirstTime_Log_From_LiveServer);
-
 // ============= displays
 let gameDisplay = document.getElementById(`game-display`);
 let menuDispaly = document.getElementById(`menu`);
@@ -809,7 +807,7 @@ function changeRound(){
 function createNewRound(){
     if (phase == 1) {
 
-        round.speed = Number((Math.random() * 0.2).toFixed(1));
+        round.speed = Number((Math.random() * 0.3).toFixed(1));
         round.dSpeed = [0.025, 0.05, 0.075][randomNum(0, 2)];
         round.wavesNum = randomNum(3, 4);
         round.ghostsNum = randomNum(2, 4);
@@ -822,11 +820,11 @@ function createNewRound(){
     }
 
     else if (phase == 2) {
-        round.speed = Number((Math.random() * 0.2).toFixed(1));
+        round.speed = Number((Math.random() * 0.4).toFixed(1));
         round.dSpeed = [0, 0.025, 0.05][randomNum(0, 2)];
         round.wavesNum = randomNum(3, 5);
-        // if speed is bigger than 0 create 2-4 ghosts
-        round.speed > 0 ? round.ghostsNum = randomNum(3, 4) : round.ghostsNum = randomNum(4, 5);
+        // if speed is bigger than 0 create 3-4 ghosts
+        round.speed > 0.1 ? round.ghostsNum = randomNum(3, 4) : round.ghostsNum = randomNum(4, 5);
         round.roundShapes = [[`—`, `|`, `<`, `>`], [`—`, `|`, `V`, `^`], [`<`, `>`, `V`, `^`]][[randomNum(0, 2)]];
         round.minShapes = randomNum(2, 3);
         round.maxShapes = randomNum(3, 4);
@@ -838,8 +836,8 @@ function createNewRound(){
         }
     }
     else if (phase == 3) {
-        round.speed = Number((Math.random() * 0.2).toFixed(1));
-        round.dSpeed = [0, 0.025][randomNum(0, 1)];
+        round.speed = Number((Math.random() * 0.7).toFixed(1));
+        round.dSpeed = [0.05, 0.075][randomNum(0, 1)];
         round.wavesNum = randomNum(4, 6);
         round.ghostsNum = randomNum(4, 6);
         round.roundShapes = [`—`, `|`, `<`, `>`, `V`, `^`];
