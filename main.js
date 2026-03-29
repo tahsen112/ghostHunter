@@ -5,12 +5,14 @@ const drawCtx = drawCanva.getContext(`2d`);
 const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 const minGhostSpeed = 0.3;
 
+console.log(sessionStorage.IsThisFirstTime_Log_From_LiveServer);
 
 // ============= displays
 let gameDisplay = document.getElementById(`game-display`);
 let menuDispaly = document.getElementById(`menu`);
 let roundDisplay = document.getElementById(`round-display`);
 let tutorialDisplay = document.getElementById(`tutorial`);
+let handFingerDisplay = document.getElementById(`hand-finger`);
 let highestScoreDisplay = document.getElementById(`highest-score`);
 
 // ============= highest score & local storage
@@ -24,6 +26,7 @@ if (localStorage.highestScore) {
 // ============= bools
 ctx.imageSmoothingEnabled = false;
 let isGhostMove = false;
+let canPlayerDraw = false;
 let isDown = false;
 let isTimerOn = false;
 let isSecondGhostSimilar = false;
@@ -147,11 +150,32 @@ let ghostPop2 = new Audio(`./audios/ghostPop2.mp3`);
 let ghostPop3 = new Audio(`./audios/ghostPop3.mp3`);
 let lastSound;
 
+// ============= rounds
+let round = {
+        speed: 0.5,
+        dSpeed: 0,
+        wavesNum: 1,
+        ghostsNum: 1,
+        roundShapes: [`—`],
+        minShapes: 1,
+        maxShapes: 1,
+        fastGhostOnWave: [],
+        isSemitry: false
+    };
+// note: speed here is like an extra speed on the ghosts speed, it's not mean the actual speed
+// note: dSpeed means the decreasing speed when you draw a ghost shape
+// note: roundShapes means the avabile shapes in this level, all shapes: [`—`, `|`, `<`, `>`, `V`, `^`, `Z`] 
+
+
+
 // ============= font
-ctx.font = `30px fantasy`;
+ctx.font = `30px "Oswald", sans-serif`;
 ctx.fillStyle = `red`;
 
 drawCtx.strokeStyle = `#4da6ff`;
+
+
+
 canva.addEventListener(`pointerdown`, function(e){
     isDown = true;
     firstX = e.offsetX;
@@ -203,7 +227,7 @@ canva.addEventListener(`pointerup`, (e) => {
 
 
 canva.addEventListener(`pointermove`, (e) => {
-    if(isDown){
+    if(isDown && canPlayerDraw){
         clearTimeout(timer);
 
         if (!lineX) {
@@ -553,6 +577,7 @@ function checkSecondGhost(index, shape){
 function hideTutorial(){
     if (isFirstTime) {
         tutorialDisplay.style.display = `none`;
+        handFingerDisplay.style.display = `none`;
         clearTimeout(tutorialTimer);
         isFirstTime = false;
     }
@@ -749,21 +774,6 @@ function draw(time){
 draw();
 
 
-let round = {
-        speed: 0,
-        dSpeed: 0,
-        wavesNum: 1,
-        ghostsNum: 1,
-        roundShapes: [`—`],
-        minShapes: 1,
-        maxShapes: 1,
-        fastGhostOnWave: [],
-        isSemitry: false
-    };
-
-// note: speed here is like an extra speed on the ghosts speed, it's not mean the actual speed
-// note: dSpeed means the decreasing speed when you draw a ghost shape
-// note: roundShapes means the avabile shapes in this level, all shapes: [`—`, `|`, `<`, `>`, `V`, `^`, `Z`] 
 
 let remainingWaves = round.wavesNum;
 
@@ -900,26 +910,30 @@ function showRoundAndScore(){
 function showRoundChange(){
     roundDisplay.innerText = `Round ${roundNum}`
     isGhostMove = false;
+    canPlayerDraw = false;
     roundDisplay.style.opacity = 1;
     setTimeout(() => {
         isGhostMove = true;
+        canPlayerDraw = true;
         roundDisplay.style.opacity = 0;
     }, 1500);
 }
 
-
 function startGame(){
     gameMode = modes.free;
     isGhostMove = true;
+    isFirstTime == true ? canPlayerDraw = false : canPlayerDraw = true;
     menuDispaly.style.display = `none`;
-    gameDisplay.style.display = `block`;
+    gameDisplay.style.display = `grid`;
     
     tutorialTimer = setTimeout(() => {
         if (isFirstTime) {
             isGhostMove = false;
+            canPlayerDraw = true;
             tutorialDisplay.style.opacity = 1;
+            handFingerDisplay.style.opacity = 1;
         }
-    }, 8000);
+    }, 4000);
 }
 
 
@@ -949,15 +963,3 @@ function saveHighestScore(){
         localStorage.highestScore = JSON.stringify(score);
     }
 }
-
-
-// animetion & pictures => ✔
-// health system => ✔
-// music ✔
-// story mode ❌ & free mode ✔
-// UI ✔
-// main menu ✔
-// animetion every time the round end ✔
-
-
-// convert text shapes that shown on the ghost to actual shapes (pics or lines) ✔
