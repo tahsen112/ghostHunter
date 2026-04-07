@@ -180,9 +180,7 @@ canva.addEventListener(`pointerdown`, function(e){
     isDown = true;
     firstX = e.offsetX;
     firstY = e.offsetY;
-
-    e.preventDefault();
-}, {passive: false});
+});
 
 
 canva.addEventListener(`pointerup`, (e) => {
@@ -227,8 +225,6 @@ canva.addEventListener(`pointerup`, (e) => {
 
 
 canva.addEventListener(`pointermove`, (e) => {
-    e.preventDefault();
-
     if(isDown && canPlayerDraw){
         clearTimeout(timer);
 
@@ -293,7 +289,7 @@ canva.addEventListener(`pointermove`, (e) => {
             }
         }, 15);
     }
-}, {passive: false});
+});
 
 
 function changeLineColor(){
