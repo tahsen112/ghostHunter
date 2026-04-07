@@ -5,6 +5,7 @@ const drawCtx = drawCanva.getContext(`2d`);
 const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 const minGhostSpeed = 0.3;
 
+
 // ============= displays
 let gameDisplay = document.getElementById(`game-display`);
 let menuDispaly = document.getElementById(`menu`);
@@ -79,12 +80,14 @@ let timer;
 let currentShape;
 let ghosts = [];
 
+let dir = [];
+let points = [];
+let lineColor = `white`;
 let lastX;
 let lastY;
-let dir = [];
 let lineX;
 let lineY;
-let xAccuracy = 30;  // it mean the long of the line to count it as a line
+let xAccuracy = 30;  // it mean the long of the drawn line to count it as a line
 let yAccuracy = -30; // (line long should be >30 or <-30 in this case)
 
 let lastPoint;
@@ -104,7 +107,6 @@ let hearts = 5;
 let roundNum = 0;
 let score = 0;
 let phase = 1;
-let tutorialTimer;
 
 let gameMode = 'menu';
 const modes = {
@@ -154,9 +156,9 @@ let round = {
         dSpeed: 0,
         wavesNum: 1,
         ghostsNum: 1,
-        roundShapes: [`—`],
-        minShapes: 1,
-        maxShapes: 1,
+        roundShapes: [`|`, `—`],
+        minShapes: 2,
+        maxShapes: 2,
         fastGhostOnWave: [],
         isSemitry: false
     };
@@ -170,7 +172,7 @@ let round = {
 ctx.font = `30px "Oswald", sans-serif`;
 ctx.fillStyle = `red`;
 
-drawCtx.strokeStyle = `#4da6ff`;
+drawCtx.strokeStyle = lineColor;
 
 
 
@@ -178,7 +180,9 @@ canva.addEventListener(`pointerdown`, function(e){
     isDown = true;
     firstX = e.offsetX;
     firstY = e.offsetY;
-})
+
+    e.preventDefault();
+}, {passive: false});
 
 
 canva.addEventListener(`pointerup`, (e) => {
@@ -186,6 +190,9 @@ canva.addEventListener(`pointerup`, (e) => {
     lastAngle = null;
     lastPoint = null;
     dir2 = [];
+    points = [];
+    lineColor = `white`;
+    drawCtx.strokeStyle = lineColor;
     lineX = 0;
     lineY = 0;
     if (!isTimerOn) {
@@ -201,15 +208,10 @@ canva.addEventListener(`pointerup`, (e) => {
     setTimeout(() => {
         lastX = 0;
         lastY = 0;
-        if (dir.length > 0) {
-            let res = dir.filter((v, i) => v !== dir[i -1]);
-
-            if (getDrawnShape(res) !== null) {
-                checkShape(getDrawnShape(res));
-            }
-            else if (currentShape !== undefined) {
-                checkShape(currentShape);
-            }
+        if (dir.length > 0 && currentShape !== undefined) {
+            
+            checkShape(currentShape);
+            currentShape = undefined;
         }
         dir = [];
 
@@ -219,12 +221,14 @@ canva.addEventListener(`pointerup`, (e) => {
             checkFastGhost();
         }
     }, 20);
-})
+});
 
 
 
 
 canva.addEventListener(`pointermove`, (e) => {
+    e.preventDefault();
+
     if(isDown && canPlayerDraw){
         clearTimeout(timer);
 
@@ -243,7 +247,13 @@ canva.addEventListener(`pointermove`, (e) => {
         lineX = e.offsetX;
         lineY = e.offsetY;
 
+        points.push({x: lineX, y: lineY});
+        
+
         let shape = getAngleDir(e.offsetX, e.offsetY);
+
+        if (currentShape) changeLineColor();
+
         if (shape) {
             dir = dir2;
             return;
@@ -253,9 +263,9 @@ canva.addEventListener(`pointermove`, (e) => {
             if (!shape) {
                 
                 if (lastX) {
-                resultX = e.offsetX - lastX;
-                resultY = e.offsetY - lastY;
-            }
+                    resultX = e.offsetX - lastX;
+                    resultY = e.offsetY - lastY;
+                }
                 else{
                     resultX = e.offsetX - firstX;
                     resultY = e.offsetY - firstY;
@@ -283,8 +293,45 @@ canva.addEventListener(`pointermove`, (e) => {
             }
         }, 15);
     }
-})
+}, {passive: false});
 
+
+function changeLineColor(){
+    if (currentShape == '—') {
+        lineColor = `#DC3F76`;
+    }
+    else if (currentShape == '|') {
+        lineColor = `#4DA6FF`;
+    }
+    else if (currentShape == '^') {
+        lineColor = `#3CA370`;
+    }
+    else if (currentShape == 'V') {
+        lineColor = `#FFD013`;
+    }
+    else if (currentShape == '<') {
+        lineColor = `#E36956`;
+    }
+    else if (currentShape == '>') {
+        lineColor = `#E356D7`;
+    }
+    
+    drawCtx.strokeStyle = lineColor;
+    drawCtx.beginPath();
+    
+    for (let i = 0; i < points.length; i++) {
+        let p = points[i];
+
+        if (i == 0) {
+            drawCtx.moveTo(p.x, p.y);
+        }
+        else {
+            drawCtx.lineTo(p.x, p.y);
+        }
+    }
+
+    drawCtx.stroke();
+}
 
 
 function randomNum(min, max){
@@ -293,14 +340,20 @@ function randomNum(min, max){
 
 // create shapes for the ghosts
 function createShapes(i){
-    let avabileShapes = round.roundShapes;
-    if (avabileShapes == undefined || avabileShapes.length == 0) avabileShapes = [`—`, `|`, `<`, `>`, `V`, `^`];
-
-    for (let s = 0; s < ghosts[i].shapesNum; s++) {
-        let randShape = randomNum(0, avabileShapes.length - 1);
-        ghosts[i].shapes.push(avabileShapes[randShape]);
+    if (isFirstTime) {
+        ghosts[0].shapes = [`|`, `—`];
     }
-    return ghosts[i].shapes;
+    else {
+        let avabileShapes = round.roundShapes;
+        if (avabileShapes == undefined || avabileShapes.length == 0) avabileShapes = [`—`, `|`, `<`, `>`, `V`, `^`];
+
+        for (let s = 0; s < ghosts[i].shapesNum; s++) {
+            let randShape = randomNum(0, avabileShapes.length - 1);
+            ghosts[i].shapes.push(avabileShapes[randShape]);
+        }
+        return ghosts[i].shapes;
+    }
+    
 }
 
 
@@ -499,7 +552,7 @@ const shapesSet = {
         ['up', 'right', 'up']
     ]
 }
-
+// ['right', 'down', 'left', 'down', 'right', 'down']
 function getDrawnShape(d){
     d = String(d);
     for(let key in shapesSet){
@@ -521,6 +574,7 @@ function checkShape(shape){
             let lastShape = ghosts[i].shapes[ghosts[i].shapesNum - 1];
             if (lastShape == shape) {
                 if (!isSecondGhostSimilar) playGhostShapeSound(i, shape);
+                if (isFirstTime) changeFingerAnime();
                 score += 10;
                 saveHighestScore();
 
@@ -574,12 +628,24 @@ function checkSecondGhost(index, shape){
 
 function hideTutorial(){
     if (isFirstTime) {
-        tutorialDisplay.style.display = `none`;
-        handFingerDisplay.style.display = `none`;
-        clearTimeout(tutorialTimer);
         isFirstTime = false;
+
+        setTimeout(() => {
+            tutorialDisplay.style.opacity = 0;
+            handFingerDisplay.style.opacity = 0;
+        }, 2000);
+
+        setTimeout(() => {
+            tutorialDisplay.style.display = `none`;
+            handFingerDisplay.style.display = `none`;
+        }, 3500);
+
     }
     
+}
+
+function changeFingerAnime(){
+    handFingerDisplay.style.animationName = `fingerY`;
 }
 
 
@@ -595,14 +661,15 @@ function getAngleDir(x, y){
     let dy = y - lastPoint.y;
 
     // ignore the small moves
-    if(Math.hypot(dx, dy) < 30) return;
+    if(Math.hypot(dx, dy) < 5) return;
 
     let angle = Math.atan2(dy, dx);
 
     lastPoint = {x, y};
     if (lastAngle == undefined || Math.abs(angle - lastAngle) > Math.PI / 4) {
         // convert angle to direction and push it in dir2 array
-        dir2.push(angleToDir(angle));
+        // dir2.push(angleToDir(angle));
+        angleToDir(angle);
         // save last angle
         lastAngle = angle;
         // put the two array togther and see if they make a shape
@@ -610,19 +677,19 @@ function getAngleDir(x, y){
         res = res.filter((v, i) => v !== res[i -1]);
         let drawnShape = getDrawnShape(res);
         
-        if (drawnShape !== null && res.length > 1) {
+        if (drawnShape !== null) {
             currentShape = drawnShape;
         }
         else {
             // check if dir make a shape then check dir2 
             res = dir.filter((v, i) => v !== dir[i -1]);
             drawnShape = getDrawnShape(res);
-            if (drawnShape !== null && res.length > 1) {
+            if (drawnShape !== null) {
                 currentShape = drawnShape;
             }
             res = dir2.filter((v, i) => v !== dir2[i -1]);
             drawnShape = getDrawnShape(res);
-            if (drawnShape !== null && res.length > 1) {
+            if (drawnShape !== null) {
                 currentShape = drawnShape;
             }
             return getDrawnShape(res);
@@ -631,19 +698,22 @@ function getAngleDir(x, y){
 
 }
 
+// make it do more than one direction by removing (return)
 function angleToDir(angle){
     let deg = angle * 180 / Math.PI;
 
     if (deg >= -45 && deg < 45) {
-        return left;
+        dir2.push(left);
+    }
+    else if (deg >= 135 || deg < -135) {
+        dir2.push(right);
     }
     if (deg >= 45 && deg < 135) {
-        return down;
+        dir2.push(down)
     }
-    if (deg >= -135 && deg < -45) {
-        return up;
+    else if (deg >= -135 && deg < -45) {
+        dir2.push(up)
     }
-    return right;
 }
 
 function drawShapeOnGhost(){
@@ -810,8 +880,8 @@ function createNewRound(){
         round.speed = Number((Math.random() * 0.3).toFixed(1));
         round.dSpeed = [0.025, 0.05, 0.075][randomNum(0, 2)];
         round.wavesNum = randomNum(3, 4);
-        round.ghostsNum = randomNum(2, 4);
-        round.roundShapes = [[`—`, `|`], [`—`, `|`, `<`, `>`]][[randomNum(0, 1)]];
+        round.ghostsNum = randomNum(2, 3);
+        round.roundShapes = [`—`, `|`];
         round.minShapes = randomNum(1, 2);
         round.maxShapes = randomNum(2, 3);
         if (roundNum >= 3) {
@@ -821,22 +891,23 @@ function createNewRound(){
 
     else if (phase == 2) {
         round.speed = Number((Math.random() * 0.4).toFixed(1));
-        round.dSpeed = [0, 0.025, 0.05][randomNum(0, 2)];
+        round.dSpeed = [0.025, 0.05][randomNum(0, 1)];
         round.wavesNum = randomNum(3, 5);
         // if speed is bigger than 0 create 3-4 ghosts
         round.speed > 0.1 ? round.ghostsNum = randomNum(3, 4) : round.ghostsNum = randomNum(4, 5);
-        round.roundShapes = [[`—`, `|`, `<`, `>`], [`—`, `|`, `V`, `^`], [`<`, `>`, `V`, `^`]][[randomNum(0, 2)]];
+        round.roundShapes = [[`—`, `|`, `<`, `>`], [`—`, `|`, `V`, `^`]][[randomNum(0, 1)]];
         round.minShapes = randomNum(2, 3);
         round.maxShapes = randomNum(3, 4);
-        round.fastGhostOnWave = createWaves4FastGhost();
+        // if player reach round 4 make fast ghosts
+        roundNum >= 4 ? round.fastGhostOnWave = createWaves4FastGhost(): 0;
         // if ghosts is more than 4 do not make semitry
-        round.ghostsNum > 4 ? round.isSemitry = false : round.isSemitry = [false, true][randomNum(0, 1)];
+        round.ghostsNum >= 4 ? round.isSemitry = false : round.isSemitry = [false, true][randomNum(0, 1)];
         if (roundNum >= 6) {
             phase++;
         }
     }
     else if (phase == 3) {
-        round.speed = Number((Math.random() * 0.7).toFixed(1));
+        round.speed = Number((Math.random() * (0.5 - 0.2) + 0.2).toFixed(1)); // 0.2 - 0.5
         round.dSpeed = [0.05, 0.075][randomNum(0, 1)];
         round.wavesNum = randomNum(4, 6);
         round.ghostsNum = randomNum(4, 6);
@@ -924,12 +995,15 @@ function startGame(){
     menuDispaly.style.display = `none`;
     gameDisplay.style.display = `grid`;
     
-    tutorialTimer = setTimeout(() => {
+    setTimeout(() => {
+        tutorialDisplay.style.opacity = 1;
+        handFingerDisplay.style.opacity = 1;
+    }, 1000);
+
+    setTimeout(() => {
         if (isFirstTime) {
             isGhostMove = false;
             canPlayerDraw = true;
-            tutorialDisplay.style.opacity = 1;
-            handFingerDisplay.style.opacity = 1;
         }
     }, 4000);
 }
