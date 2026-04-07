@@ -180,7 +180,6 @@ canva.addEventListener(`pointerdown`, function(e){
     isDown = true;
     firstX = e.offsetX;
     firstY = e.offsetY;
-
 });
 
 
@@ -207,18 +206,9 @@ canva.addEventListener(`pointerup`, (e) => {
     setTimeout(() => {
         lastX = 0;
         lastY = 0;
-        if (dir.length > 0) {
-            console.log(dir)
-            console.log(currentShape);
-            let res = dir.filter((v, i) => v !== dir[i -1]);
-
-            if (currentShape !== undefined) {
-                checkShape(currentShape);
-            }
-            else if (getDrawnShape(res) !== null) {
-                checkShape(getDrawnShape(res));
-            }
-
+        if (dir.length > 0 && currentShape !== undefined) {
+            
+            checkShape(currentShape);
             currentShape = undefined;
         }
         dir = [];
@@ -235,8 +225,6 @@ canva.addEventListener(`pointerup`, (e) => {
 
 
 canva.addEventListener(`pointermove`, (e) => {
-    e.preventDefault();
-
     if(isDown && canPlayerDraw){
         clearTimeout(timer);
 
@@ -301,7 +289,7 @@ canva.addEventListener(`pointermove`, (e) => {
             }
         }, 15);
     }
-}, {passive: false});
+});
 
 
 function changeLineColor(){
