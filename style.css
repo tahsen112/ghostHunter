@@ -21,17 +21,21 @@ body {
 
 #game {
     touch-action: none;
+    grid-area: 1 / 1;
+    justify-self: center;
+    align-self: center;
     image-rendering: pixelated;
     background-image: url(imgs/backGround.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    grid-area: 1 / 1;
 }
 
 #draw {
-    pointer-events: none;
     grid-area: 1 / 1;
+    justify-self: center;
+    align-self: center;
+    pointer-events: none;
 }
 
 #round-display {
@@ -49,6 +53,9 @@ body {
 }
 
 #tutorial {
+    grid-area: 1 / 1;
+    justify-self: center;
+    align-self: center;
     color: #ffb300;
     font-size: 25px;
     text-align: center;
@@ -57,28 +64,38 @@ body {
     border-radius: 15px;
     margin: 0;
     opacity: 0;
-    transition: 1s;
+    transition: 1.5s;
     pointer-events: none;
-    grid-area: 1 / 1;
     margin-top: -35%;
 }
 
 #hand-finger {
     grid-area: 1 / 1;
+    justify-self: center;
+    align-self: center;
     color: #ffb300;
     font-size: 53px;
-    margin-left: -80%;
-    transition: 1s;
+    margin-left: -60%;
+    transition: 1.5s;
     opacity: 0;
-    animation: finger 1.2s linear 0s infinite alternate;
+    animation: fingerX 1.2s linear 0s infinite alternate;
 }
 
-@keyframes finger {
+@keyframes fingerX {
     from {
         margin-left: -75%;
     }
     to {
         margin-left: -60%;
+    }
+}
+
+@keyframes fingerY {
+    from {
+        margin-top: -7%;
+    }
+    to {
+        margin-top: 8%;
     }
 }
 
