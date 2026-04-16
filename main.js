@@ -207,7 +207,8 @@ canva.addEventListener(`pointerup`, (e) => {
         lastX = 0;
         lastY = 0;
         if (dir.length > 0 && currentShape !== undefined) {
-            
+
+            console.log(true, currentShape);
             checkShape(currentShape);
             currentShape = undefined;
         }
