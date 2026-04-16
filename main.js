@@ -180,6 +180,7 @@ canva.addEventListener(`pointerdown`, function(e){
     isDown = true;
     firstX = e.offsetX;
     firstY = e.offsetY;
+    currentShape = undefined;
 });
 
 
@@ -207,10 +208,8 @@ canva.addEventListener(`pointerup`, (e) => {
         lastX = 0;
         lastY = 0;
         if (dir.length > 0 && currentShape !== undefined) {
-
-            console.log(true, currentShape);
+            
             checkShape(currentShape);
-            currentShape = undefined;
         }
         dir = [];
 
@@ -294,6 +293,8 @@ canva.addEventListener(`pointermove`, (e) => {
 
 
 function changeLineColor(){
+    drawCtx.clearRect(0, 0, canva.width, canva.height);
+    
     if (currentShape == '—') {
         lineColor = `#DC3F76`;
     }
@@ -665,7 +666,6 @@ function getAngleDir(x, y){
     lastPoint = {x, y};
     if (lastAngle == undefined || Math.abs(angle - lastAngle) > Math.PI / 4) {
         // convert angle to direction and push it in dir2 array
-        // dir2.push(angleToDir(angle));
         angleToDir(angle);
         // save last angle
         lastAngle = angle;
@@ -695,7 +695,7 @@ function getAngleDir(x, y){
 
 }
 
-// make it do more than one direction by removing (return)
+
 function angleToDir(angle){
     let deg = angle * 180 / Math.PI;
 
@@ -725,8 +725,6 @@ function drawShapeOnGhost(){
         convertShapes(i, gap, centerX, centerY);
     }
 }
-
-
 
 
 function convertShapes(i, gap, centerX, centerY){
@@ -816,7 +814,7 @@ function moveGhost(){
 function draw(time){
     if (gameMode == modes.free) {
         
-        ctx.clearRect(0, 0, canva.width, canva.height)
+        ctx.clearRect(0, 0, canva.width, canva.height);
         moveGhost();
         drawGhost();
         drawShapeOnGhost();
@@ -904,7 +902,7 @@ function createNewRound(){
         }
     }
     else if (phase == 3) {
-        round.speed = Number((Math.random() * (0.5 - 0.2) + 0.2).toFixed(1)); // 0.2 - 0.5
+        round.speed = Number((Math.random() * (0.5 - 0.2) + 0.2).toFixed(1)); // 0.2 - 0.4
         round.dSpeed = [0.05, 0.075][randomNum(0, 1)];
         round.wavesNum = randomNum(4, 6);
         round.ghostsNum = randomNum(4, 6);
@@ -945,7 +943,7 @@ function drawHearts(){
 
 function giveHeart(){
     if (hearts < 5) {
-        let pHearts = [``, ``, `h`, ``, ``, ``, `h`, ``, `h`, ``]; // 40%
+        let pHearts = [``, ``, `h`, ``, ``, ``, `h`, ``, `h`, ``]; // 30%
         let h = pHearts[randomNum(0, pHearts.length - 1)];
         if (h == `h`) {
             hearts++;
