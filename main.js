@@ -207,8 +207,8 @@ canva.addEventListener(`pointerup`, (e) => {
     setTimeout(() => {
         lastX = 0;
         lastY = 0;
-        if (dir.length > 0 && currentShape !== undefined) {
-            
+        if (currentShape) {
+            console.log(currentShape);
             checkShape(currentShape);
         }
         dir = [];
@@ -570,6 +570,7 @@ function checkShape(shape){
         isSecondGhostSimilar = false;
         for (let i = 0; i < ghosts.length; i++) {
             let lastShape = ghosts[i].shapes[ghosts[i].shapesNum - 1];
+            console.log(lastShape);
             if (lastShape == shape) {
                 if (!isSecondGhostSimilar) playGhostShapeSound(i, shape);
                 if (isFirstTime) changeFingerAnime();
