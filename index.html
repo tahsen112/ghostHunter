@@ -16,9 +16,15 @@
 </head>
 
 <body id="body">
+    <audio src="./audios/bgMusic.mp3" id="bgMusic" loop></audio>
+
     <div id="game-display">
         <canvas id="game"></canvas>
         <canvas id="draw"></canvas>
+
+        <div class="mute-btn" onclick="muteBgMusic()">
+            <i class="fa-solid fa-volume-high" id="muteBtn"></i>
+        </div>
         <p id="round-display"></p>
         <p id="tutorial">
             Defeat the ghost by drawing its symbole anywhere
