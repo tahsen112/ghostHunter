@@ -13,6 +13,7 @@ let roundDisplay = document.getElementById(`round-display`);
 let tutorialDisplay = document.getElementById(`tutorial`);
 let handFingerDisplay = document.getElementById(`hand-finger`);
 let highestScoreDisplay = document.getElementById(`highest-score`);
+let muteBtn = document.getElementById(`muteBtn`);
 
 // ============= highest score & local storage
 let highestScore = 0;
@@ -29,6 +30,7 @@ let canPlayerDraw = false;
 let isDown = false;
 let isTimerOn = false;
 let isSecondGhostSimilar = false;
+let isFading = false;
 let isFirstTime = true;
 
 
@@ -94,7 +96,11 @@ let lastPoint;
 let lastAngle;
 let dir2 = [];
 
-let frameDuration = 100; // ms
+let alpha = 1;
+let fadeStart = 0;
+const fadeDuration = 500;  // 500ms
+
+let frameDuration = 100; // 100ms
 let lastTime = 0;
 let animeSpeed = 2;
 let yDir = 1; // 1 or -1
@@ -145,6 +151,10 @@ let heartImg = new Image();
 heartImg.src = `./imgs/heart.png`;
 
 // ============= audios
+let bgMusic = new Audio(`./audios/bgMusic.mp3`);
+bgMusic.loop = true;
+bgMusic.volume = 0.3;
+
 let ghostPop1 = new Audio(`./audios/ghostPop1.mp3`);
 let ghostPop2 = new Audio(`./audios/ghostPop2.mp3`);
 let ghostPop3 = new Audio(`./audios/ghostPop3.mp3`);
@@ -173,44 +183,44 @@ ctx.font = `30px "Oswald", sans-serif`;
 ctx.fillStyle = `red`;
 
 drawCtx.strokeStyle = lineColor;
+drawCtx.lineWidth = 15;
+drawCtx.lineCap = "round";
+drawCtx.lineJoin = "round";
 
 
 
 canva.addEventListener(`pointerdown`, function(e){
+    drawCtx.clearRect(0, 0, canva.width, canva.height);
+
     isDown = true;
+    isFading = false;
+    points = [];
+
     firstX = e.offsetX;
     firstY = e.offsetY;
+    points.push({x: firstX, y: firstY});
+
     currentShape = undefined;
 });
 
 
 canva.addEventListener(`pointerup`, (e) => {
     isDown = false;
+    isFading = true;
+    fadeStart = performance.now();
+    
     lastAngle = null;
     lastPoint = null;
     dir2 = [];
-    points = [];
     lineColor = `white`;
     drawCtx.strokeStyle = lineColor;
     lineX = 0;
     lineY = 0;
-    if (!isTimerOn) {
-        timer = setTimeout(() => {
-            drawCtx.clearRect(0, 0, canva.width, canva.height);
-            isTimerOn = false;
-        }, 150);
-    }
-    else{
-        clearTimeout(timer);
-    }
 
     setTimeout(() => {
         lastX = 0;
         lastY = 0;
-        if (currentShape) {
-            console.log(currentShape);
-            checkShape(currentShape);
-        }
+        if (currentShape) checkShape(currentShape);
         dir = [];
 
         if (ghosts.length == 0 && remainingWaves > 0) {
@@ -223,22 +233,9 @@ canva.addEventListener(`pointerup`, (e) => {
 
 
 
-
 canva.addEventListener(`pointermove`, (e) => {
     if(isDown && canPlayerDraw){
         clearTimeout(timer);
-
-        if (!lineX) {
-            lineX = e.offsetX;
-            lineY = e.offsetY;
-        }
-        // paint a smooth line when pointer move 
-        drawCtx.beginPath();
-        drawCtx.moveTo(lineX, lineY);
-        drawCtx.lineTo(e.offsetX, e.offsetY);
-        drawCtx.lineWidth = 15;
-        drawCtx.lineCap = "round";
-        drawCtx.stroke();
 
         lineX = e.offsetX;
         lineY = e.offsetY;
@@ -247,8 +244,6 @@ canva.addEventListener(`pointermove`, (e) => {
         
 
         let shape = getAngleDir(e.offsetX, e.offsetY);
-
-        if (currentShape) changeLineColor();
 
         if (shape) {
             dir = dir2;
@@ -272,6 +267,7 @@ canva.addEventListener(`pointermove`, (e) => {
 
                 if (resultX > xAccuracy) {
                     dir.push(left);
+                    
                 }
                 else if(resultX < -xAccuracy){
                     dir.push(right);
@@ -292,9 +288,31 @@ canva.addEventListener(`pointermove`, (e) => {
 });
 
 
-function changeLineColor(){
+function drawline(){
+    if(points.length < 2) return;
+
+    drawCtx.globalAlpha = alpha;
+    drawCtx.strokeStyle = getLineColor();
+
+    drawCtx.beginPath();
+    for (let i = 0; i < points.length; i++) {
+        let p = points[i];
+
+        if (i == 0) {
+            drawCtx.moveTo(p.x, p.y);
+        }
+        else {
+            drawCtx.lineTo(p.x, p.y);
+        }
+    }
+
+    drawCtx.stroke();
+}
+
+
+function getLineColor(){
     drawCtx.clearRect(0, 0, canva.width, canva.height);
-    
+
     if (currentShape == '—') {
         lineColor = `#DC3F76`;
     }
@@ -313,23 +331,10 @@ function changeLineColor(){
     else if (currentShape == '>') {
         lineColor = `#E356D7`;
     }
-    
-    drawCtx.strokeStyle = lineColor;
-    drawCtx.beginPath();
-    
-    for (let i = 0; i < points.length; i++) {
-        let p = points[i];
 
-        if (i == 0) {
-            drawCtx.moveTo(p.x, p.y);
-        }
-        else {
-            drawCtx.lineTo(p.x, p.y);
-        }
-    }
-
-    drawCtx.stroke();
+    return lineColor;
 }
+
 
 
 function randomNum(min, max){
@@ -545,12 +550,12 @@ const shapesSet = {
         ['left', 'up', 'right', 'up', 'right', 'up'],
         ['left', 'up', 'left', 'up', 'right', 'up', 'right', 'up'],
         ['left', 'up'],
-        ['left', 'right']
+        ['left', 'right'],
         ['down', 'right', 'down'],
         ['up', 'right', 'up']
     ]
 }
-// ['right', 'down', 'left', 'down', 'right', 'down']
+
 function getDrawnShape(d){
     d = String(d);
     for(let key in shapesSet){
@@ -570,7 +575,7 @@ function checkShape(shape){
         isSecondGhostSimilar = false;
         for (let i = 0; i < ghosts.length; i++) {
             let lastShape = ghosts[i].shapes[ghosts[i].shapesNum - 1];
-            console.log(lastShape);
+            
             if (lastShape == shape) {
                 if (!isSecondGhostSimilar) playGhostShapeSound(i, shape);
                 if (isFirstTime) changeFingerAnime();
@@ -605,7 +610,7 @@ function playGhostShapeSound(i, shape){
         randomSound = randomSound[randomNum(0, 2)];
     }
 
-    randomSound.volume = 0.2;
+    randomSound.volume = 0.4;
     randomSound.play();
     lastSound = randomSound;
 
@@ -820,8 +825,24 @@ function draw(time){
         drawGhost();
         drawShapeOnGhost();
         drawPlayer(playerImg);
+        drawline();
         drawHearts();
         showRoundAndScore();
+
+        // if pointer up make the line fade
+        if (isFading) {
+            let progress = (time - fadeStart) / fadeDuration;
+            alpha = Number(Math.max(0, 1 - progress).toFixed(1));
+            
+            if (alpha == 0) {
+                drawCtx.clearRect(0, 0, canva.width, canva.height);
+                isFading = false;
+                points = [];
+            }
+        }
+        else {
+            alpha = 1;
+        }
     
         if (time - lastTime > frameDuration) {
             CY += animeSpeed * yDir;
@@ -985,6 +1006,9 @@ function showRoundChange(){
 }
 
 function startGame(){
+    bgMusic.play();
+    muteBtn.classList.replace(`fa-volume-xmark`, `fa-volume-high`);
+
     gameMode = modes.free;
     isGhostMove = true;
     isFirstTime == true ? canPlayerDraw = false : canPlayerDraw = true;
@@ -1005,6 +1029,18 @@ function startGame(){
 }
 
 
+function muteBgMusic(){
+    if (muteBtn.classList.contains(`fa-volume-high`)) {
+        muteBtn.classList.replace(`fa-volume-high`, `fa-volume-xmark`);
+        bgMusic.pause();
+    }
+    else {
+        muteBtn.classList.replace(`fa-volume-xmark`, `fa-volume-high`);
+        bgMusic.play();
+    }
+}
+
+
 function showMainMenu(){
     gameMode = modes.menu;
     menuDispaly.style.display = `flex`;
@@ -1017,6 +1053,9 @@ function showMainMenu(){
 }
 
 function resetGame(){
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    
     phase = 1;
     score = 0;
     roundNum = 1;
