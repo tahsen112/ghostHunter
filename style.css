@@ -38,6 +38,14 @@ body {
     pointer-events: none;
 }
 
+.mute-btn {
+    grid-area: 1 / 1;
+    color: #ffb300;
+    font-size: 28px;
+    margin-right: -89%;
+    margin-bottom: -44%;
+}
+
 #round-display {
     position: absolute;
     color: red;
