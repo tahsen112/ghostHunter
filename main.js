@@ -241,7 +241,6 @@ canva.addEventListener(`pointermove`, (e) => {
         lineY = e.offsetY;
 
         points.push({x: lineX, y: lineY});
-        
 
         let shape = getAngleDir(e.offsetX, e.offsetY);
 
@@ -286,6 +285,16 @@ canva.addEventListener(`pointermove`, (e) => {
         }, 15);
     }
 });
+
+
+document.addEventListener(`visibilitychange`, () => {
+    if (document.hidden) {
+        bgMusic.pause();
+    }
+    else if (muteBtn.classList.contains(`fa-volume-high`)) {
+        bgMusic.play();
+    }
+})
 
 
 function drawline(){
@@ -610,7 +619,7 @@ function playGhostShapeSound(i, shape){
         randomSound = randomSound[randomNum(0, 2)];
     }
 
-    randomSound.volume = 0.4;
+    randomSound.volume = 0.6;
     randomSound.play();
     lastSound = randomSound;
 
@@ -1055,7 +1064,7 @@ function showMainMenu(){
 function resetGame(){
     bgMusic.pause();
     bgMusic.currentTime = 0;
-    
+
     phase = 1;
     score = 0;
     roundNum = 1;
