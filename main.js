@@ -619,7 +619,7 @@ function playGhostShapeSound(i, shape){
         randomSound = randomSound[randomNum(0, 2)];
     }
 
-    randomSound.volume = 0.6;
+    randomSound.volume = 0.8;
     randomSound.play();
     lastSound = randomSound;
 
