@@ -31,6 +31,7 @@ let isDown = false;
 let isTimerOn = false;
 let isSecondGhostSimilar = false;
 let isFading = false;
+let wasPlaying = false;
 let isFirstTime = true;
 
 
@@ -153,7 +154,7 @@ heartImg.src = `./imgs/heart.png`;
 // ============= audios
 let bgMusic = new Audio(`./audios/bgMusic.mp3`);
 bgMusic.loop = true;
-bgMusic.volume = 0.3;
+bgMusic.volume = 0.5;
 
 let ghostPop1 = new Audio(`./audios/ghostPop1.mp3`);
 let ghostPop2 = new Audio(`./audios/ghostPop2.mp3`);
@@ -289,9 +290,10 @@ canva.addEventListener(`pointermove`, (e) => {
 
 document.addEventListener(`visibilitychange`, () => {
     if (document.hidden) {
+        wasPlaying = !bgMusic.paused;
         bgMusic.pause();
     }
-    else if (muteBtn.classList.contains(`fa-volume-high`)) {
+    else if (wasPlaying) {
         bgMusic.play();
     }
 })
@@ -619,7 +621,7 @@ function playGhostShapeSound(i, shape){
         randomSound = randomSound[randomNum(0, 2)];
     }
 
-    randomSound.volume = 0.8;
+    randomSound.volume = 0.4;
     randomSound.play();
     lastSound = randomSound;
 
