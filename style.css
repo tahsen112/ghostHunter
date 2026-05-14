@@ -11,6 +11,10 @@ body {
     align-items: center;
 }
 
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
 #game-display {
     display: none;
     align-content: center;
@@ -41,7 +45,7 @@ body {
 .mute-btn {
     grid-area: 1 / 1;
     color: #ffb300;
-    font-size: 28px;
+    font-size: 25px;
     margin-right: -89%;
     margin-bottom: -44%;
 }
